@@ -1,9 +1,12 @@
-# obsidian-remote
+# obsidian-web
 
-This docker image allows you to run [obsidian](https://obsidian.md/) in docker as a container and access it via your web browser.
+This docker image allows you to run [obsidian](https://obsidian.md/) in docker as a container and access it via your web browser thanks to [KasmVNC](https://github.com/linuxserver/docker-baseimage-kasmvnc).
+
+> Note on the fork: this repo is an indipendent fork of [sytone/obsidian-remote](https://github.com/sytone/obsidian-remote) as you can see from the top "forked from" description. I decided not to make this repo indipendent yet, even tho when I will have time to clean it a bit more I will. This repo is intended to restart the good work done by the original dev adding a couple of extra things, mainly to automate the build of the docker image with the latest Obsidian and KasmVNC version.
 
 Use `http://localhost:8080/` to access it locally, do not expose this to the web unless you secure it and know what you are doing!!
 
+Quick guide links *(in the future I will create a wiki)*:
 - [Using the Container](#using-the-container)
   - [Ports](#ports)
   - [Mapped Volumes](#mapped-volumes)

@@ -1,13 +1,10 @@
 FROM ghcr.io/linuxserver/baseimage-kasmvnc:debianbookworm
 
-LABEL maintainer="github@sytone.com" \
-      org.opencontainers.image.authors="github@sytone.com" \
-      org.opencontainers.image.source="https://github.com/sytone/obsidian-remote" \
-      org.opencontainers.image.title="Container hosted Obsidian MD" \
-      org.opencontainers.image.description="Hosted Obsidian instance allowing access via web browser"
-
-# Set version label
-ARG OBSIDIAN_VERSION=1.7.7
+# LABEL maintainer="github@xX-MrN0b0dy-Xx" \
+#       org.opencontainers.image.authors="github@xX-MrN0b0dy-Xx" \
+#       org.opencontainers.image.source="https://github.com/xX-MrN0b0dy-Xx/obsidian-remote" \
+#       org.opencontainers.image.title="Obsidian MD with KasmVNC" \
+#       org.opencontainers.image.description="Hosted Obsidian instance accessible via web browser through KasmVNC"
 
 # Update and install extra packages
 RUN echo "**** install packages ****" && \
@@ -16,8 +13,12 @@ RUN echo "**** install packages ****" && \
     apt-get autoclean && rm -rf /var/lib/apt/lists/* /var/tmp/* /tmp/*
 
 # Download and install Obsidian
-RUN echo "**** download obsidian ****" && \
-    curl --location --output obsidian.deb "https://github.com/obsidianmd/obsidian-releases/releases/download/v${OBSIDIAN_VERSION}/obsidian_${OBSIDIAN_VERSION}_amd64.deb" && \
+RUN echo "**** Get latest Obsidian release ****" && \
+    OBSIDIAN_VERSION=$(curl -s https://api.github.com/repos/obsidianmd/obsidian-releases/releases/latest | grep tag_name | cut -d '"' -f 4 | sed 's/^v//') && \
+    echo "Latest version: $OBSIDIAN_VERSION" && \
+    echo "" && \
+    echo "**** Download and Install Obsidian ****" && \
+    curl -L -o obsidian.deb "https://github.com/obsidianmd/obsidian-releases/releases/download/v${OBSIDIAN_VERSION}/obsidian_${OBSIDIAN_VERSION}_amd64.deb" && \
     dpkg -i obsidian.deb && \
     rm obsidian.deb
 
