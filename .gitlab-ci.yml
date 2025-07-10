@@ -4,7 +4,6 @@ services:
   - docker:24.0.5-dind
 
 variables:
-  IMAGE_VERSION: ""
   IMAGE_BASE: $CI_REGISTRY_IMAGE
   IMAGE_TAG_COMMIT: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
   IMAGE_TAG_BRANCH: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
@@ -38,6 +37,9 @@ build_image:
     - docker tag $CI_REGISTRY_IMAGE:$OBSIDIAN_VERSION $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
     - docker tag $CI_REGISTRY_IMAGE:$OBSIDIAN_VERSION $CI_REGISTRY_IMAGE:latest
     - echo "🛠️  Build completed for Obsidian version $OBSIDIAN_VERSION"
+  artifacts:
+    paths:
+      - .obsidian-version
 
 push_image:
   stage: push
