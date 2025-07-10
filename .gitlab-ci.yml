@@ -1,31 +1,31 @@
-image: docker:git
+image: docker:24.0.5
 
 services:
-  - docker:dind
+  - docker:24.0.5-dind
 
 variables:
-  IMAGE_BASE: $CI_REGISTRY_IMAGE
-  IMAGE_TAG_COMMIT: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
-  IMAGE_TAG_BRANCH: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
-  IMAGE_TAG_LATEST: $CI_REGISTRY_IMAGE:latest
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
 
 stages:
   - prepare
   - build
   - push
 
+before_script:
+  - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+
 extract_version:
   stage: prepare
   script:
+    - echo "🔍 Extrahiere OBSIDIAN_VERSION aus Dockerfile..."
     - export OBSIDIAN_VERSION=$(grep -E '^ARG OBSIDIAN_VERSION=' Dockerfile | cut -d= -f2)
-    - echo "📦 Version extracted $OBSIDIAN_VERSION"
-    - echo $OBSIDIAN_VERSION > .obsidian-version
+    - echo "📦 Version extrahiert $OBSIDIAN_VERSION"
+    - echo "$OBSIDIAN_VERSION" > .obsidian-version
   artifacts:
     paths:
       - .obsidian-version
-
-before_script:
-  - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    expire_in: 1 hour
 
 build_image:
   stage: build
@@ -33,13 +33,10 @@ build_image:
     - extract_version
   script:
     - export OBSIDIAN_VERSION=$(cat .obsidian-version)
+    - echo "🛠️  Baue Image mit Version $OBSIDIAN_VERSION"
     - docker build --build-arg OBSIDIAN_VERSION=$OBSIDIAN_VERSION -t $CI_REGISTRY_IMAGE:$OBSIDIAN_VERSION .
     - docker tag $CI_REGISTRY_IMAGE:$OBSIDIAN_VERSION $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
     - docker tag $CI_REGISTRY_IMAGE:$OBSIDIAN_VERSION $CI_REGISTRY_IMAGE:latest
-    - echo "🛠️  Build completed for Obsidian version $OBSIDIAN_VERSION"
-  artifacts:
-    paths:
-      - .obsidian-version
 
 push_image:
   stage: push
@@ -48,7 +45,7 @@ push_image:
     - extract_version
   script:
     - export OBSIDIAN_VERSION=$(cat .obsidian-version)
+    - echo "📤 Pushe Tags $OBSIDIAN_VERSION, $CI_COMMIT_SHORT_SHA, latest"
     - docker push $CI_REGISTRY_IMAGE:$OBSIDIAN_VERSION
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
     - docker push $CI_REGISTRY_IMAGE:latest
-    - echo "📤 All tags pushed for Obsidian $OBSIDIAN_VERSION"
