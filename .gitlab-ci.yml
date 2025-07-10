@@ -1,7 +1,7 @@
-image: docker:latest
+image: docker:git
 
 services:
-  - docker:latest-dind
+  - docker:dind
 
 variables:
   IMAGE_BASE: $CI_REGISTRY_IMAGE
