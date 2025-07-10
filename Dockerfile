@@ -7,7 +7,7 @@ LABEL maintainer="subhead@gmail.com" \
       org.opencontainers.image.description="Hosted Obsidian instance allowing access via web browser"
 
 # Set version label
-ARG OBSIDIAN_VERSION=1.8.9
+ARG OBSIDIAN_VERSION=1.8.10
 
 # Update and install extra packages
 RUN echo "**** install packages ****" && \
