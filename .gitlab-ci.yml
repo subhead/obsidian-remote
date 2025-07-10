@@ -8,44 +8,28 @@ variables:
   DOCKER_TLS_CERTDIR: ""
 
 stages:
-  - prepare
-  - build
-  - push
+  - build_and_push
 
 before_script:
   - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
 
-extract_version:
-  stage: prepare
+build_and_push_image:
+  stage: build_and_push
   script:
-    - echo "🔍 Extrahiere OBSIDIAN_VERSION aus Dockerfile..."
+    # Version aus Dockerfile extrahieren
     - export OBSIDIAN_VERSION=$(grep -E '^ARG OBSIDIAN_VERSION=' Dockerfile | cut -d= -f2)
-    - echo "📦 Version extrahiert $OBSIDIAN_VERSION"
-    - echo "$OBSIDIAN_VERSION" > .obsidian-version
-  artifacts:
-    paths:
-      - .obsidian-version
-    expire_in: 1 hour
+    - echo "Using OBSIDIAN_VERSION=$OBSIDIAN_VERSION"
 
-build_image:
-  stage: build
-  dependencies:
-    - extract_version
-  script:
-    - export OBSIDIAN_VERSION=$(cat .obsidian-version)
-    - echo "🛠️  Baue Image mit Version $OBSIDIAN_VERSION"
+    # Image bauen
     - docker build --build-arg OBSIDIAN_VERSION=$OBSIDIAN_VERSION -t $CI_REGISTRY_IMAGE:$OBSIDIAN_VERSION .
+    - echo "Container build!"
+    # Weitere Tags setzen
     - docker tag $CI_REGISTRY_IMAGE:$OBSIDIAN_VERSION $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
     - docker tag $CI_REGISTRY_IMAGE:$OBSIDIAN_VERSION $CI_REGISTRY_IMAGE:latest
+    - echo "Tags set."
 
-push_image:
-  stage: push
-  dependencies:
-    - build_image
-    - extract_version
-  script:
-    - export OBSIDIAN_VERSION=$(cat .obsidian-version)
-    - echo "📤 Pushe Tags $OBSIDIAN_VERSION, $CI_COMMIT_SHORT_SHA, latest"
+    # Pushen
     - docker push $CI_REGISTRY_IMAGE:$OBSIDIAN_VERSION
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
     - docker push $CI_REGISTRY_IMAGE:latest
+    - echo "Container pushed to registry."
