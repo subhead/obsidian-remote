@@ -1,7 +1,7 @@
-image: docker:28.3.2
+image: docker:latest
 
 services:
-  - docker:28.3.2-dind
+  - docker:latest-dind
 
 variables:
   IMAGE_BASE: $CI_REGISTRY_IMAGE
