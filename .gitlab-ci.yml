@@ -1,7 +1,7 @@
-image: docker:24.0.5
+image: docker:28.3.2
 
 services:
-  - docker:24.0.5-dind
+  - docker:28.3.2-dind
 
 variables:
   IMAGE_BASE: $CI_REGISTRY_IMAGE
@@ -45,6 +45,7 @@ push_image:
   stage: push
   dependencies:
     - build_image
+    - extract_version
   script:
     - export OBSIDIAN_VERSION=$(cat .obsidian-version)
     - docker push $CI_REGISTRY_IMAGE:$OBSIDIAN_VERSION
