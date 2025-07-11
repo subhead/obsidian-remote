@@ -1,10 +1,6 @@
 FROM ghcr.io/linuxserver/baseimage-kasmvnc:debianbookworm
 
-LABEL maintainer="subhead@gmail.com" \
-      org.opencontainers.image.authors="subhead@gmail.com" \
-      org.opencontainers.image.source="https://github.com/sublabs/obsidian-remote" \
-      org.opencontainers.image.title="Container hosted Obsidian MD" \
-      org.opencontainers.image.description="Hosted Obsidian instance allowing access via web browser"
+LABEL maintainer="subhead@gmail.com"
 
 # Set version label
 ARG OBSIDIAN_VERSION=1.8.10
